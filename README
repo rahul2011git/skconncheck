@@ -1,0 +1,70 @@
+This repository contains source code for a limited functionality wrapper library
+for libcurl and a test application for the wrapper library.
+
+This code has been written according to the requirements specification for
+the SamKnows Technical Test on GitHub:
+https://github.com/SamKnows/tests-and-metrics-test
+
+Prerequisites:
+libcurl - on Ubuntu this can be installed by running
+`sudo apt-get install libcurl4-openssl-dev`.
+The code has been built and tested with libcurl version 7.47.0.
+
+Directory structure:
+skconncheck
+-> Makefile
+-> README	
+-> prototype.c - a quick test program to gain familiarity with libcurl API.
+    This is not built by the makefile but can be compiled using the following
+    gcc command line in directory skconncheck:
+    `gcc prototype.c -o prototype -lcurl `
+-> src
+	-> skconncheck.c - source file for the wrapper library
+-> inc
+	-> skconncheck.h - header file for the wrapper library
+->test
+	-> sk_test.c - souce file for the test application
+
+How to build:
+The Makefile is in the top-level directory skconncheck
+> cd skconncheck
+> make all					#builds the library and the test application
+> make all DEBUG_BUILD=1	#builds the library with extra debug information
+> make clean				#deletes the built binaries
+
+Test application Usage:
+> ./sk_test [-H <HTTP Header>]... [-n <Number of HTTP requests to make>]
+If no parameters are specified, sk_test sends one get request with no additional
+HTTP Headers.
+
+Limitations:
+sk_test accepts up to 100 HTTP Headers via the command line and limits the 
+number of HTTP requests to 100 as well.
+
+The 100 headers limit has been chosen after a quick google search which 
+indicated that Apache Server Limits the requests to 100. The 100 request limit 
+has been arbitrarily chosen as a test limit. Given more time it should be 
+possible to determine an appropriate limit by going through the relevant some 
+standards, RFCs, etc.
+
+Other tests run on the code:
+The sk_test executable has been inspected for leaks with valgrind
+valgrind --leak-check=full --show-leak-kinds=all 
+
+Possible Enhancements:
+If more time was allocated to this task several enhancements can be added which 
+will make the code less error-prone, maintainable and possibly more efficient.
+
+- More useful and descriptive error codes.
+- Add error handling mechanisms.
+- Add compile time and/or run time version checks. The host PC may have an older
+version of libcurl which may not support all the required calls and timing info.
+- More detailed comments.
+- A more efficient implementation of the median function. Median using qsort is 
+quick and easy to code but not the most efficient way to implement it.
+- Investigate splitting main in sk_test.c into smaller functions.
+- Profile the code to check for any "low-hanging" performance gain opportunities.
+- Find a more efficient and cleaner way of setting up the HTTP Headers linked
+list.
+- Investigate if including any of the cache-control headers as default in the 
+GET request make a difference to the timing statistics.
